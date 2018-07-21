@@ -1,0 +1,167 @@
+﻿﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>testPage</title>
+
+    <script type="text/javascript" src="Scripts/vue.min.js"></script>
+    <link rel="stylesheet" href="iview/iview.css" />
+    <style>
+        textarea.ivu-input {
+            font-family: "微软雅黑";
+            font-size: 22px;
+        }
+
+        .ivu-cascader .ivu-cascader-menu-item {
+            width: 30vw;
+        }
+    </style>
+    <script type="text/javascript" src="Scripts/iview.min.js"></script>
+    <script type="text/javascript" src="Scripts/axios.min.js"></script>
+    <script type="text/javascript">
+        var $$ = (x) =>[].slice.call(x); //将对象转化为数组
+        window.onload = function () {
+            Vue.prototype.$ajax = axios;
+            new Vue({
+                el: "#app",
+                data() {
+                    return {
+                        datavalue: `{\n\n}`,
+                        result: "",
+                        isresult: true,
+                        interfaces: "",
+                        paras: [],
+                        alltypeinfo: {},
+                        vdata: []
+                    }
+                },
+                created: function () {
+                    this.$ajax({
+                        method: 'get',
+                        url: '/home/home/GetAllCtrollerActionNames',
+                    }).then((t) => {
+                        this.alltypeinfo = t.data;
+                        this.vdata = getIViewJiLianData(t.data);
+                        console.log(this.alltypeinfo);
+                    });
+                },
+                watch: {
+                    result: function (val) {
+                        this.isresult = val.length > 0 ? false : true;
+                    }
+                },
+                methods: {
+                    cmd: function () {
+                        let urls = this.interfaces;
+                        let datav = eval('(' + this.datavalue + ')');
+                        //							let paras = new URLSearchParams();
+                        //							for(let i in datav) {
+                        //								paras.append(i, datav[i]);
+                        //							}
+                        console.log(urls);
+                        this.$ajax({
+                            method: 'post',
+                            url: urls,
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            data: getDataUrl(datav)
+                            //,
+                            //						    transformRequest: [function(data) {
+                            //							    // Do whatever you want to transform the data
+                            //							    let ret = ''
+                            //							    for(let it in data) {
+                            //								    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                            //							    }
+                            //							    return ret
+                            //						    }],
+                        }).then((t) => this.result = JSON.stringify(t.data, null, "&nbsp"));
+                    },
+                    handleChange: function (value, selectedData) {
+                        this.paras = this.alltypeinfo[value[0]][value[1]][value[2]];
+                        this.interfaces = selectedData[selectedData.length - 1].__label.replace(/\s/g, "");
+                        let postvalue = `{\n`
+                        this.paras.forEach((x) =>postvalue += x + `:,\n`);
+                        if (postvalue.indexOf(",") >= 0) {
+                            postvalue = postvalue.substring(0, postvalue.lastIndexOf(","));
+                        }
+                        postvalue += `\n}`
+                        this.datavalue = postvalue;
+                    }
+                }
+            })
+        }
+
+        function getIViewJiLianData(t) {
+            let result = [];
+            if (Array.isArray(t)) {
+                return [];
+            } else {
+                for (let k in t) {
+                    let v = t[k];
+                    let item = {
+                        value: k,
+                        label: k,
+                        children: getIViewJiLianData(v)
+                    };
+                    result.push(item);
+                }
+                return result;
+            }
+        }
+
+        //将对象解析成key=value
+        function getDataUrl(obj) {
+            let date = new Date();
+            let str = '?timer=' + date.getTime();
+            for (let n in obj) {
+                str += '&' + n + '=' + obj[n];
+            }
+            return str;
+        }
+    </script>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <div id="app">
+        <i-Row>
+            <i-Col span="22">
+                <div>
+                    <Cascader :data="vdata" size="large" @on-change="handleChange"></Cascader>
+                </div>
+            </i-Col>
+
+            <i-Col span="2">
+                <div>
+                    <i-button type="primary" @click="cmd">
+                        <Icon type="ios-cog" size="23"></Icon>
+                    </i-button>
+                </div>
+            </i-Col>
+        </i-Row>
+
+        <i-input size="large" v-model="datavalue" type="textarea" :rows="6" placeholder="Data..."></i-input>
+        <br /><br />
+        <br />
+        <h2>
+            <span>
+                {{interfaces}}
+            </span>&emsp;&emsp;result:
+        </h2><br />
+        <Card style="height:450px">
+            <div style="text-align:center">
+                <Icon type="checkmark-round" size="80" v-if="!isresult"></Icon>
+                <Icon type="close-round" size="80" v-if="isresult"></Icon>
+            </div>
+            <br />
+            <div>
+                <h3 v-html="result"></h3>
+            </div>
+
+        </Card>
+    </div>
+</body>
+
+</html>

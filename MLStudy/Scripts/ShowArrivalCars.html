@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ShowArrivalCars</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./iview/iview.css" />
+    <link rel="stylesheet" href="./Content/Styles.css" />
+
+    <script type="text/javascript" src="./Scripts/vue.min.js"></script>
+    <script type="text/javascript" src="./Scripts/iview.min.js"></script>
+    <script type="text/javascript" src="./Scripts/axios.min.js"></script>
+    <script type="text/javascript" src="./Scripts/d3(3.5.17).min.js"></script>
+    <script type="text/javascript" src="./Scripts/axioshelper.js"></script>
+    <script type="text/javascript" src="./Scripts/colorChange.js"></script>
+    <script type="text/javascript" src="./Scripts/d3helper.js"></script>
+    <script type="text/javascript" src="./Scripts/TempData.js"></script>
+
+    <script type="text/javascript">
+        window.onload = function () {
+            Vue.prototype.$ajax = axios;
+            new Vue({
+                el: "#app",
+                data() {
+                    return {
+                        STNNameData: [],
+                        AllLinesData: [],
+                        AllArrivalCars: [],
+                        timer: "",
+                        dater: ""
+                    }
+                },
+                created: function () {
+
+                },
+                watch: {
+
+                },
+                methods: {
+                    cmd: function () {
+                        let that = this;
+                        let qdate = that.dater.Format("yyyyMMdd");
+                        this.$ajax({
+                            method: 'post',
+                            url: "/arrivalcars/ArrivalCars/GetSTNNameData",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            data: getDataUrl({
+                                queryTime: qdate
+                            })
+                        }).then((t) => {
+                            let STNNames = t.data;
+                            that.$ajax({
+                                method: 'post',
+                                url: "/arrivalcars/ArrivalCars/GetAllLinesDataByTime",
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded"
+                                },
+                                data: getDataUrl({
+                                    queryTime: qdate
+                                })
+                            }).then((x) => {
+                                allquery(STNNames, x.data);
+                            });
+                        });
+                    }
+                }
+            });
+        }
+
+        function allquery(STNNames, AllLines) {
+            d3.select("#bg").selectAll("*").style("display", "none");
+            let svgSize = {
+                w: 1000,
+                h: 1000
+            };
+            let margin = {
+                top: 60,
+                bottom: 40,
+                left: 80,
+                right: 50
+            };
+            let sv = d3.select("#bg").append("svg").attr({
+                "width": svgSize.w,
+                "height": svgSize.h
+            });
+            drawBundle(STNNames, AllLines,sv, svgSize, margin);
+        }
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <i-Row>
+            <i-col span="10">
+                <Date-picker v-model="dater" type="date" format="yyyy-MM-dd" placeholder="选择日期" style="width: 200px"></Date-picker>
+            </i-col>
+            <i-col span="10">
+                <Time-picker v-model="timer" format="HH’mm" type="timerange" placement="bottom-end" style="width: 240px" placeholder="选择时间"></Time-picker>
+            </i-col>
+            <i-col span="4">
+                <div>
+
+                    <i-button type="primary" @click="cmd">查询
+                        <Icon type="ios-cog" size="18"></Icon>
+                    </i-button>
+                </div>
+            </i-col>
+        </i-Row>
+        <div id="bg">
+        </div>
+    </div>
+</body>
+
+</html>
