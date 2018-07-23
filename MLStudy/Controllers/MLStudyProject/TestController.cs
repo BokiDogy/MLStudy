@@ -15,7 +15,7 @@ namespace MLStudy.Controllers.MLStudyProject
         {
             return View();
         }
-        public JsonResult ShowMLResult(string dataPath)
+        public JsonResult ShowMLResult()
         {
             JsonResult json = Json(mt.ShowMLResult());
             json.JsonRequestBehavior = JsonRequestBehavior.AllowGet;

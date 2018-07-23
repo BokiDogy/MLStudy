@@ -15,31 +15,7 @@ namespace MLCompute
         // input for prediction operations
         // - First 4 properties are inputs/features used to predict the label
         // - Label is what you are predicting, and is only set when training
-        public class IrisData
-        {
-            [Column("0")]
-            public float SepalLength;
 
-            [Column("1")]
-            public float SepalWidth;
-
-            [Column("2")]
-            public float PetalLength;
-
-            [Column("3")]
-            public float PetalWidth;
-
-            [Column("4")]
-            [ColumnName("Label")]
-            public string Label;
-        }
-
-        // IrisPrediction is the result returned from prediction operations
-        public class IrisPrediction
-        {
-            [ColumnName("PredictedLabel")]
-            public string PredictedLabels;
-        }
 
         public string ShowMLResult()
         {
@@ -49,9 +25,9 @@ namespace MLCompute
             // If working in Visual Studio, make sure the 'Copy to Output Directory' 
             // property of iris-data.txt is set to 'Copy always'
 
-            string dataPath = @"F:\developerwang\dotnet\MLStudy\MLCompute\iris_data.txt";
-            var x = new TextLoader(dataPath).CreateFrom<IrisData>(separator: ',');
-            pipeline.Add(new TextLoader(dataPath).CreateFrom<IrisData>(separator: ','));
+            string dataPath = @"F:\developerwang\dotnet\MLStudy\MLCompute\iris-data.txt";
+            pipeline.Add(new TextLoader(dataPath).CreateFrom<IrisData>(useHeader: true, separator: ','));
+            //pipeline.Add(new TextLoader(dataPath).CreateFrom<IrisData>(separator: ','));
 
             // STEP 3: Transform your data
             // Assign numeric values to text in the "Label" column, because only
@@ -82,7 +58,7 @@ namespace MLCompute
                 PetalWidth = 5.1f,
             });
 
-            return $"Predicted flower type is: {prediction.PredictedLabels}";
+            return prediction.PredictedLabels;
         }
     }
 }
