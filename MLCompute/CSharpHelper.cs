@@ -145,21 +145,21 @@ namespace MLCompute
 
 
 
-        public static string RunExe(string exePath)
-        {
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            p.StartInfo = new System.Diagnostics.ProcessStartInfo();
-            p.StartInfo.FileName = "mlTest.exe";
-            p.StartInfo.Arguments = exePath + " " + "run";//"C0解释器.exe"的相对路径  空格分隔各个参数 这里有两个参数。
-            p.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;//让窗体不显示
-            p.Start();
-            System.IO.StreamReader reader = p.StandardOutput;//截取输出流
-            string line = reader.ReadLine();//每次读取一行
-            return p.StandardOutput.ReadToEnd();//获得的结果显示在listbox1中
-        }
+        //public static string RunExe(string exePath)
+        //{
+        //    System.Diagnostics.Process p = new System.Diagnostics.Process();
+        //    p.StartInfo = new System.Diagnostics.ProcessStartInfo();
+        //    p.StartInfo.FileName = "mlTest.exe";
+        //    p.StartInfo.Arguments = exePath + " " + "run";//"C0解释器.exe"的相对路径  空格分隔各个参数 这里有两个参数。
+        //    p.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+        //    p.StartInfo.RedirectStandardOutput = true;
+        //    p.StartInfo.UseShellExecute = false;
+        //    p.StartInfo.CreateNoWindow = true;//让窗体不显示
+        //    p.Start();
+        //    System.IO.StreamReader reader = p.StandardOutput;//截取输出流
+        //    string line = reader.ReadLine();//每次读取一行
+        //    return p.StandardOutput.ReadToEnd();//获得的结果显示在listbox1中
+        //}
 
     }
 }
